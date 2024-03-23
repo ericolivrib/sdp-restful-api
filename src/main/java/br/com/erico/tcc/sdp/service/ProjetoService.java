@@ -1,9 +1,13 @@
 package br.com.erico.tcc.sdp.service;
 
+import br.com.erico.tcc.sdp.dto.NovoProjetoDto;
 import br.com.erico.tcc.sdp.dto.ProjetoResponseDto;
+import br.com.erico.tcc.sdp.model.EixoTecnologico;
+import br.com.erico.tcc.sdp.model.Projeto;
 import br.com.erico.tcc.sdp.repository.ProjetoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -22,6 +26,13 @@ public class ProjetoService {
                         p.getJustificativa(), p.getDataCriacao(), p.getAno(), p.getStatus().getId(),
                         p.isPortalProjetos(), p.getDataFinalizacao(), p.getImpactosAmbientais()))
                 .orElseThrow(() -> new Exception("Projeto " + projetoId + " não encontrado"));
+    }
+
+    public UUID addProjeto(NovoProjetoDto novoProjetoDto) {
+        var projeto = novoProjetoDto.toProjetoEntity();
+        var savedProjeto = projetoRepository.save(projeto);
+
+        return savedProjeto.getId();
     }
 
 }
