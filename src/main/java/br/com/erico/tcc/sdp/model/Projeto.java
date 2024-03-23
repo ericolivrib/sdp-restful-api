@@ -12,6 +12,7 @@ public class Projeto {
 
     @Id
     @Column(name = "uuid_projeto", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @Column(name = "numero_projeto", nullable = false, length = 6)
     private String numero;

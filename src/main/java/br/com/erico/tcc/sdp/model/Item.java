@@ -12,6 +12,7 @@ public class Item {
 
     @Id
     @Column(name = "uuid_item", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @Column(name = "descricao")
     private String descricao;

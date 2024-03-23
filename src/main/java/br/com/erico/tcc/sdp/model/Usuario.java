@@ -12,6 +12,7 @@ public class Usuario {
 
     @Id
     @Column(name = "uuid_usuario", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @Column(name = "siape", nullable = false, unique = true)
     private Integer siape;
