@@ -1,6 +1,5 @@
 package br.com.erico.tcc.sdp.model;
 
-import br.com.erico.tcc.sdp.enumeration.StatusParecerTecnicoEnum;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -21,8 +20,7 @@ public class ParecerTecnico {
     @Column(name = "parecer_tecnico")
     private String descricao;
     @Column(name = "status_parecer")
-    @Enumerated(EnumType.STRING)
-    private StatusParecerTecnicoEnum status;
+    private String status;
     @Column(name = "recurso")
     private String recurso;
     @Column(name = "data_parecer")
@@ -68,11 +66,11 @@ public class ParecerTecnico {
         this.descricao = descricao;
     }
 
-    public StatusParecerTecnicoEnum getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(StatusParecerTecnicoEnum status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

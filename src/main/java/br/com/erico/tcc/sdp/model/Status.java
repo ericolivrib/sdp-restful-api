@@ -1,17 +1,22 @@
 package br.com.erico.tcc.sdp.model;
 
-import br.com.erico.tcc.sdp.enumeration.StatusEnum;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "status")
 public class Status {
+
     @Id
     @Column(name = "id_status", nullable = false)
     private Integer id;
     @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private StatusEnum nome;
+    private String nome;
+    @OneToMany(mappedBy = "status")
+    private List<Projeto> projetos;
+    @OneToMany(mappedBy = "status")
+    private List<Item> itens;
 
     public Integer getId() {
         return id;
@@ -21,12 +26,28 @@ public class Status {
         this.id = id;
     }
 
-    public StatusEnum getNome() {
+    public String getNome() {
         return nome;
     }
 
-    public void setNome(StatusEnum nome) {
+    public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public List<Projeto> getProjetos() {
+        return projetos;
+    }
+
+    public void setProjetos(List<Projeto> projetos) {
+        this.projetos = projetos;
+    }
+
+    public List<Item> getItens() {
+        return itens;
+    }
+
+    public void setItens(List<Item> itens) {
+        this.itens = itens;
     }
 
 }

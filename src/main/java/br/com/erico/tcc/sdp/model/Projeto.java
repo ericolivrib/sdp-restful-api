@@ -1,7 +1,5 @@
 package br.com.erico.tcc.sdp.model;
 
-import br.com.erico.tcc.sdp.enumeration.ModalidadeEnum;
-import br.com.erico.tcc.sdp.enumeration.StatusEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -13,15 +11,14 @@ import java.util.UUID;
 public class Projeto {
 
     @Id
-    @Column(name = "uuiid_projeto", nullable = false)
+    @Column(name = "uuid_projeto", nullable = false)
     private UUID id;
     @Column(name = "numero_projeto", nullable = false, length = 6)
     private String numero;
     @Column(name = "nome_projeto")
     private String nome;
     @Column(name = "modalidade", length = 10)
-    @Enumerated(EnumType.STRING)
-    private ModalidadeEnum modalidade;
+    private String modalidade;
     @Column(name = "justificativa")
     private String justificativa;
     @Column(name = "impactos_ambientais")
@@ -36,9 +33,9 @@ public class Projeto {
     private Short ano;
     @Column(name = "portal_projeto")
     private boolean portalProjetos;
-    @Column(name = "id_status")
-    @Enumerated(EnumType.ORDINAL)
-    private StatusEnum status;
+    @ManyToOne
+    @JoinColumn(name = "id_status", nullable = false)
+    private Status status;
     @ManyToOne
     @JoinColumn(name = "uuid_usuario", nullable = false)
     private Usuario usuario;
@@ -72,11 +69,11 @@ public class Projeto {
         this.nome = nome;
     }
 
-    public ModalidadeEnum getModalidade() {
+    public String getModalidade() {
         return modalidade;
     }
 
-    public void setModalidade(ModalidadeEnum modalidade) {
+    public void setModalidade(String modalidade) {
         this.modalidade = modalidade;
     }
 
@@ -136,11 +133,11 @@ public class Projeto {
         this.portalProjetos = portalProjetos;
     }
 
-    public StatusEnum getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(StatusEnum status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

@@ -1,6 +1,5 @@
 package br.com.erico.tcc.sdp.model;
 
-import br.com.erico.tcc.sdp.enumeration.PeriodoEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;

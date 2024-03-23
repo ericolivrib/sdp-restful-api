@@ -1,6 +1,5 @@
 package br.com.erico.tcc.sdp.model;
 
-import br.com.erico.tcc.sdp.enumeration.NaturezaEnum;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -14,8 +13,9 @@ public class Demanda {
     private String id;
     @Column(name = "demanda", length = 100)
     private String nome;
-    @Column(name = "id_natureza")
-    private NaturezaEnum natureza;
+    @ManyToOne
+    @JoinColumn(name = "id_natureza", nullable = false)
+    private Natureza natureza;
     @Column(name = "descricao")
     private String descricao;
     @Column(name = "exemplo")
@@ -39,11 +39,11 @@ public class Demanda {
         this.nome = nome;
     }
 
-    public NaturezaEnum getNatureza() {
+    public Natureza getNatureza() {
         return natureza;
     }
 
-    public void setNatureza(NaturezaEnum natureza) {
+    public void setNatureza(Natureza natureza) {
         this.natureza = natureza;
     }
 

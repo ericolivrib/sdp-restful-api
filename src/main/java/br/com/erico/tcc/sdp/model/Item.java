@@ -1,6 +1,5 @@
 package br.com.erico.tcc.sdp.model;
 
-import br.com.erico.tcc.sdp.enumeration.StatusEnum;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -29,9 +28,9 @@ public class Item {
     private String justificativa;
     @Column(name = "solicitacao")
     private String solicitacao;
-    @Column(name = "id_status")
-    @Enumerated(EnumType.ORDINAL)
-    private StatusEnum status;
+    @ManyToOne
+    @JoinColumn(name = "id_status", nullable = false)
+    private Status status;
     @ManyToOne
     @JoinColumn(name = "id_demanda", nullable = false)
     private Demanda demanda;
@@ -105,11 +104,11 @@ public class Item {
         this.solicitacao = solicitacao;
     }
 
-    public StatusEnum getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(StatusEnum status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
