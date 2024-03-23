@@ -10,12 +10,16 @@ import java.util.List;
 public class Demanda {
 
     @Id
-    @Column(name = "id", nullable = false, length = 20)
+    @Column(name = "id_demanda", nullable = false, length = 20)
     private String id;
     @Column(name = "demanda", length = 100)
     private String nome;
     @Column(name = "id_natureza")
     private NaturezaEnum natureza;
+    @Column(name = "descricao")
+    private String descricao;
+    @Column(name = "exemplo")
+    private String exemplo;
     @OneToMany(mappedBy = "demanda", cascade = CascadeType.ALL)
     private List<Item> itens;
 
@@ -41,6 +45,22 @@ public class Demanda {
 
     public void setNatureza(NaturezaEnum natureza) {
         this.natureza = natureza;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public String getExemplo() {
+        return exemplo;
+    }
+
+    public void setExemplo(String exemplo) {
+        this.exemplo = exemplo;
     }
 
     public List<Item> getItens() {

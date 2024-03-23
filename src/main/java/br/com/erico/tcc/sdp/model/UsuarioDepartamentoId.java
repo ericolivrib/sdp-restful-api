@@ -9,7 +9,7 @@ import java.util.UUID;
 @Embeddable
 public class UsuarioDepartamentoId implements Serializable {
 
-    @Column(name = "id_usuario", nullable = false)
+    @Column(name = "uuid_usuario", nullable = false)
     private UUID usuarioId;
     @Column(name = "id_departamento", nullable = false)
     private Integer departamentoId;

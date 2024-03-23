@@ -12,7 +12,7 @@ public class UsuarioDepartamento {
     private UsuarioDepartamentoId id;
     @ManyToOne
     @MapsId("usuarioId")
-    @JoinColumn(name = "id_usuario")
+    @JoinColumn(name = "uuid_usuario")
     private Usuario usuario;
     @ManyToOne
     @MapsId("departamentoId")

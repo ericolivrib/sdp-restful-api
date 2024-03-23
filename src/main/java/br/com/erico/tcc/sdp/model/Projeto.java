@@ -13,7 +13,7 @@ import java.util.UUID;
 public class Projeto {
 
     @Id
-    @Column(name = "id_projeto", nullable = false)
+    @Column(name = "uuiid_projeto", nullable = false)
     private UUID id;
     @Column(name = "numero_projeto", nullable = false, length = 6)
     private String numero;
@@ -40,7 +40,7 @@ public class Projeto {
     @Enumerated(EnumType.ORDINAL)
     private StatusEnum status;
     @ManyToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @JoinColumn(name = "uuid_usuario", nullable = false)
     private Usuario usuario;
     @ManyToOne
     @JoinColumn(name = "id_eixo", nullable = false)

@@ -12,7 +12,7 @@ import java.util.UUID;
 public class Item {
 
     @Id
-    @Column(name = "id", nullable = false)
+    @Column(name = "uuid_item", nullable = false)
     private UUID id;
     @Column(name = "descricao")
     private String descricao;
@@ -36,7 +36,7 @@ public class Item {
     @JoinColumn(name = "id_demanda", nullable = false)
     private Demanda demanda;
     @ManyToOne
-    @JoinColumn(name = "id_projeto", nullable = false)
+    @JoinColumn(name = "uuid_projeto", nullable = false)
     private Projeto projeto;
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<ParecerTecnico> pareceresTecnicos;

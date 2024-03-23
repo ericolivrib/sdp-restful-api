@@ -14,7 +14,7 @@ public class ParecerTecnico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false)
+    @Column(name = "uuid_parecer_tecnico", nullable = false)
     private UUID id;
     @Column(name = "local")
     private String local;
@@ -35,10 +35,10 @@ public class ParecerTecnico {
     @ElementCollection
     private List<String> periodoAjustado;
     @ManyToOne
-    @JoinColumn(name = "id_item", nullable = false)
+    @JoinColumn(name = "uuid_item", nullable = false)
     private Item item;
     @ManyToOne
-    @JoinColumn(name = "id_responsavel", nullable = false)
+    @JoinColumn(name = "uuid_responsavel", nullable = false)
     private Usuario responsavel;
     @ManyToOne
     @JoinColumn(name = "id_departamento", nullable = false)
