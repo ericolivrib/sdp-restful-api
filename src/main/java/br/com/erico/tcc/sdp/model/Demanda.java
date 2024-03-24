@@ -18,7 +18,7 @@ public class Demanda {
     private Natureza natureza;
     @Column(name = "descricao")
     private String descricao;
-    @Column(name = "exemplo")
+    @Column(name = "exemplos")
     private String exemplo;
     @OneToMany(mappedBy = "demanda", cascade = CascadeType.ALL)
     private List<Item> itens;
