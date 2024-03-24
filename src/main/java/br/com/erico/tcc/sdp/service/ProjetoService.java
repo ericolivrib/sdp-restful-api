@@ -71,8 +71,7 @@ public class ProjetoService {
         projeto.setDataCriacao(LocalDate.now());
         projeto.setAno((short) LocalDate.now().getYear());
 
-        var status = new Status();
-        status.setId(StatusEnum.NAO_FINALIZADO.ordinal());
+        var status = new Status(StatusEnum.NAO_FINALIZADO);
         projeto.setStatus(status);
 
         var savedProjeto = projetoRepository.save(projeto);
