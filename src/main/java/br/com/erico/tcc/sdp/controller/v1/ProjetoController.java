@@ -50,7 +50,13 @@ public class ProjetoController {
     @PostMapping
     public UUID addProjeto(@RequestBody NovoProjetoDto novoProjetoDto) {
         LOGGER.info("Adicionando projeto {}", novoProjetoDto.toString());
-        return projetoService.addProjeto(novoProjetoDto);
+
+        try {
+            return projetoService.addProjeto(novoProjetoDto);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return null;
+        }
     }
 
     @PutMapping("/{projetoId}")

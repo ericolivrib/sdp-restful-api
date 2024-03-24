@@ -49,7 +49,10 @@ public class ProjetoService {
                 .orElseThrow(() -> new Exception("Não foram encontrados projetos com ID " + projetoId));
     }
 
-    public UUID addProjeto(NovoProjetoDto novoProjetoDto) {
+    public UUID addProjeto(NovoProjetoDto novoProjetoDto) throws Exception {
+        usuarioRepository.findById(novoProjetoDto.usuarioId())
+                .orElseThrow(() -> new Exception("Não foram encontrados usuários com o ID " + novoProjetoDto.usuarioId()));
+
         var projeto = new Projeto();
         projeto.setNumero(novoProjetoDto.numero());
         projeto.setNome(novoProjetoDto.nome().toUpperCase());
