@@ -3,6 +3,7 @@ package br.com.erico.tcc.sdp.service;
 import br.com.erico.tcc.sdp.dto.NovoProjetoDto;
 import br.com.erico.tcc.sdp.dto.ProjetoResponseDto;
 import br.com.erico.tcc.sdp.dto.ProjetoUsuarioResponseDto;
+import br.com.erico.tcc.sdp.dto.UpdateProjetoDto;
 import br.com.erico.tcc.sdp.model.EixoTecnologico;
 import br.com.erico.tcc.sdp.model.Projeto;
 import br.com.erico.tcc.sdp.repository.ProjetoRepository;
@@ -51,6 +52,19 @@ public class ProjetoService {
         var savedProjeto = projetoRepository.save(projeto);
 
         return savedProjeto.getId();
+    }
+
+    public void updateProjeto(UpdateProjetoDto updateProjetoDto, UUID projetoId) throws Exception {
+        var projeto = projetoRepository.findById(projetoId)
+                .orElseThrow(() -> new Exception("Não foram encontrados projetos com ID " + projetoId));
+
+        projeto.setNumero(updateProjetoDto.numero() != null ? updateProjetoDto.numero() : projeto.getNumero());
+        projeto.setNome(updateProjetoDto.nome() != null ? updateProjetoDto.nome().toUpperCase() : projeto.getNome());
+        projeto.setModalidade(updateProjetoDto.modalidade() != null ? updateProjetoDto.modalidade() : projeto.getModalidade());
+        projeto.setJustificativa(updateProjetoDto.justificativa() != null ? updateProjetoDto.justificativa() : projeto.getJustificativa());
+        projeto.setImpactosAmbientais(updateProjetoDto.impactosAmbientais() != null ? updateProjetoDto.impactosAmbientais() : projeto.getImpactosAmbientais());
+
+        projetoRepository.save(projeto);
     }
 
 }

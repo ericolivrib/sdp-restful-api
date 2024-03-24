@@ -3,6 +3,7 @@ package br.com.erico.tcc.sdp.controller.v1;
 import br.com.erico.tcc.sdp.dto.NovoProjetoDto;
 import br.com.erico.tcc.sdp.dto.ProjetoResponseDto;
 import br.com.erico.tcc.sdp.dto.ProjetoUsuarioResponseDto;
+import br.com.erico.tcc.sdp.dto.UpdateProjetoDto;
 import br.com.erico.tcc.sdp.service.ProjetoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,19 @@ public class ProjetoController {
     public UUID addProjeto(@RequestBody NovoProjetoDto novoProjetoDto) {
         LOGGER.info("Adicionando projeto {}", novoProjetoDto.toString());
         return projetoService.addProjeto(novoProjetoDto);
+    }
+
+    @PutMapping("/{projetoId}")
+    public boolean updateProjeto(@RequestBody UpdateProjetoDto updateProjetoDto, @PathVariable UUID projetoId) {
+        LOGGER.info("Atualizando dados do projeto {}", projetoId);
+
+        try {
+            projetoService.updateProjeto(updateProjetoDto, projetoId);
+            return true;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return false;
+        }
     }
 
 }
