@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -90,6 +91,18 @@ public class ProjetoService {
         projeto.setImpactosAmbientais(updateProjetoDto.impactosAmbientais() != null ? updateProjetoDto.impactosAmbientais() : projeto.getImpactosAmbientais());
 
         projetoRepository.save(projeto);
+    }
+
+    public void deleteProjeto(UUID projetoId) throws Exception {
+        var projeto = projetoRepository.findById(projetoId)
+                .orElseThrow(() -> new Exception("Não foram encontrados projetos com ID " + projetoId));
+
+        if (!Objects.equals(projeto.getStatus().getId(), StatusEnum.NAO_FINALIZADO.getId()) &&
+                !Objects.equals(projeto.getStatus().getId(), StatusEnum.NAO_APROVADO.getId())) {
+            throw new Exception("Projetos com status "+ projeto.getStatus().getId() + " (" + projeto.getStatus().getNome() + ") não podem ser deletados");
+        }
+
+        projetoRepository.delete(projeto);
     }
 
 }

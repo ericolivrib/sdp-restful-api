@@ -72,4 +72,17 @@ public class ProjetoController {
         }
     }
 
+    @DeleteMapping("/{projetoId}")
+    public boolean deleteProjeto(@PathVariable("projetoId") UUID projetoId) {
+        LOGGER.info("Deletando projeto {}", projetoId);
+
+        try {
+            projetoService.deleteProjeto(projetoId);
+            return true;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return false;
+        }
+    }
+
 }
