@@ -4,11 +4,13 @@ import br.com.erico.tcc.sdp.dto.NovoProjetoDto;
 import br.com.erico.tcc.sdp.dto.ProjetoResponseDto;
 import br.com.erico.tcc.sdp.dto.ProjetoUsuarioResponseDto;
 import br.com.erico.tcc.sdp.dto.UpdateProjetoDto;
+import br.com.erico.tcc.sdp.enumeration.PeriodoEnum;
 import br.com.erico.tcc.sdp.enumeration.StatusEnum;
 import br.com.erico.tcc.sdp.model.EixoTecnologico;
 import br.com.erico.tcc.sdp.model.Projeto;
 import br.com.erico.tcc.sdp.model.Status;
 import br.com.erico.tcc.sdp.model.Usuario;
+import br.com.erico.tcc.sdp.repository.PeriodoRepository;
 import br.com.erico.tcc.sdp.repository.ProjetoRepository;
 import br.com.erico.tcc.sdp.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,15 @@ public class ProjetoService {
 
     private final ProjetoRepository projetoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final PeriodoRepository periodoRepository;
 
-    public ProjetoService(ProjetoRepository projetoRepository, UsuarioRepository usuarioRepository) {
+    public ProjetoService(ProjetoRepository projetoRepository, UsuarioRepository usuarioRepository, PeriodoRepository periodoRepository) {
         this.projetoRepository = projetoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.periodoRepository = periodoRepository;
     }
 
-    public List<ProjetoUsuarioResponseDto> getProjetosByUsuario(UUID usuarioId) throws Exception{
+    public List<ProjetoUsuarioResponseDto> getProjetosByUsuario(UUID usuarioId) throws Exception {
         usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new Exception("Não foram encontrados usuários com ID " + usuarioId));
 
@@ -53,6 +57,14 @@ public class ProjetoService {
     public UUID addProjeto(NovoProjetoDto novoProjetoDto) throws Exception {
         usuarioRepository.findById(novoProjetoDto.usuarioId())
                 .orElseThrow(() -> new Exception("Não foram encontrados usuários com o ID " + novoProjetoDto.usuarioId()));
+
+        var periodoSubmissaoProjetos = periodoRepository.findById(PeriodoEnum.SUBMISSAO_PROJETOS.getId())
+                .orElseThrow(() -> new Exception("Falha ao consultar período de submissão de projetos"));
+
+        if (periodoSubmissaoProjetos.getDataInicio().isAfter(LocalDate.now()) ||
+                periodoSubmissaoProjetos.getDataFim().isBefore(LocalDate.now())) {
+            throw new Exception("Fora do prazo de submissão de projetos");
+        }
 
         var projeto = new Projeto();
         projeto.setNumero(novoProjetoDto.numero());
@@ -99,7 +111,7 @@ public class ProjetoService {
 
         if (!Objects.equals(projeto.getStatus().getId(), StatusEnum.NAO_FINALIZADO.getId()) &&
                 !Objects.equals(projeto.getStatus().getId(), StatusEnum.NAO_APROVADO.getId())) {
-            throw new Exception("Projetos com status "+ projeto.getStatus().getId() + " (" + projeto.getStatus().getNome() + ") não podem ser deletados");
+            throw new Exception("Projetos com status " + projeto.getStatus().getId() + " (" + projeto.getStatus().getNome() + ") não podem ser deletados");
         }
 
         projetoRepository.delete(projeto);
