@@ -66,25 +66,24 @@ public class ProjetoService {
             throw new Exception("Fora do prazo de submissão de projetos");
         }
 
+        var usuario = new Usuario();
+        usuario.setId(novoProjetoDto.usuarioId());
+
+        var eixoTecnologico = new EixoTecnologico();
+        eixoTecnologico.setId(novoProjetoDto.eixoTecnologicoId());
+
+        var status = new Status(StatusEnum.NAO_FINALIZADO);
+
         var projeto = new Projeto();
         projeto.setNumero(novoProjetoDto.numero());
         projeto.setNome(novoProjetoDto.nome().toUpperCase());
         projeto.setModalidade(novoProjetoDto.modalidade());
         projeto.setJustificativa(novoProjetoDto.justificativa());
-
-        var usuario = new Usuario();
-        usuario.setId(novoProjetoDto.usuarioId());
-        projeto.setUsuario(usuario);
-
-        var eixoTecnologico = new EixoTecnologico();
-        eixoTecnologico.setId(novoProjetoDto.eixoTecnologicoId());
-        projeto.setEixoTecnologico(eixoTecnologico);
-
         projeto.setImpactosAmbientais(novoProjetoDto.impactosAmbientais());
         projeto.setDataCriacao(LocalDate.now());
         projeto.setAno((short) LocalDate.now().getYear());
-
-        var status = new Status(StatusEnum.NAO_FINALIZADO);
+        projeto.setUsuario(usuario);
+        projeto.setEixoTecnologico(eixoTecnologico);
         projeto.setStatus(status);
 
         var savedProjeto = projetoRepository.save(projeto);
