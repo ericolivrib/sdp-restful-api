@@ -16,13 +16,13 @@ public class Projeto {
     private UUID id;
     @Column(name = "numero_projeto", nullable = false, length = 6)
     private String numero;
-    @Column(name = "nome_projeto")
+    @Column(name = "nome_projeto", nullable = false)
     private String nome;
-    @Column(name = "modalidade", length = 10)
+    @Column(name = "modalidade", length = 10, nullable = false)
     private String modalidade;
-    @Column(name = "justificativa")
+    @Column(name = "justificativa", nullable = false)
     private String justificativa;
-    @Column(name = "impactos_ambientais")
+    @Column(name = "impactos_ambientais", nullable = false)
     private String impactosAmbientais;
     @Column(name = "data_criacao")
     private LocalDate dataCriacao;
