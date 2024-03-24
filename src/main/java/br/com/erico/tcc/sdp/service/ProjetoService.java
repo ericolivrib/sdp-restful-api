@@ -4,8 +4,11 @@ import br.com.erico.tcc.sdp.dto.NovoProjetoDto;
 import br.com.erico.tcc.sdp.dto.ProjetoResponseDto;
 import br.com.erico.tcc.sdp.dto.ProjetoUsuarioResponseDto;
 import br.com.erico.tcc.sdp.dto.UpdateProjetoDto;
+import br.com.erico.tcc.sdp.enumeration.StatusEnum;
 import br.com.erico.tcc.sdp.model.EixoTecnologico;
 import br.com.erico.tcc.sdp.model.Projeto;
+import br.com.erico.tcc.sdp.model.Status;
+import br.com.erico.tcc.sdp.model.Usuario;
 import br.com.erico.tcc.sdp.repository.ProjetoRepository;
 import br.com.erico.tcc.sdp.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -13,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class ProjetoService {
@@ -48,7 +50,28 @@ public class ProjetoService {
     }
 
     public UUID addProjeto(NovoProjetoDto novoProjetoDto) {
-        var projeto = novoProjetoDto.toProjetoEntity();
+        var projeto = new Projeto();
+        projeto.setNumero(novoProjetoDto.numero());
+        projeto.setNome(novoProjetoDto.nome().toUpperCase());
+        projeto.setModalidade(novoProjetoDto.modalidade());
+        projeto.setJustificativa(novoProjetoDto.justificativa());
+
+        var usuario = new Usuario();
+        usuario.setId(novoProjetoDto.usuarioId());
+        projeto.setUsuario(usuario);
+
+        var eixoTecnologico = new EixoTecnologico();
+        eixoTecnologico.setId(novoProjetoDto.eixoTecnologicoId());
+        projeto.setEixoTecnologico(eixoTecnologico);
+
+        projeto.setImpactosAmbientais(novoProjetoDto.impactosAmbientais());
+        projeto.setDataCriacao(LocalDate.now());
+        projeto.setAno((short) LocalDate.now().getYear());
+
+        var status = new Status();
+        status.setId(StatusEnum.NAO_FINALIZADO.ordinal());
+        projeto.setStatus(status);
+
         var savedProjeto = projetoRepository.save(projeto);
 
         return savedProjeto.getId();
