@@ -1,5 +1,6 @@
 package br.com.erico.tcc.sdp.model;
 
+import br.com.erico.tcc.sdp.enumeration.StatusEnum;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -17,6 +18,14 @@ public class Status {
     private List<Projeto> projetos;
     @OneToMany(mappedBy = "status")
     private List<Item> itens;
+
+    public Status() {
+    }
+
+    public Status(StatusEnum statusEnum) {
+        this.id = statusEnum.getId();
+        this.nome = statusEnum.getNome();
+    }
 
     public Integer getId() {
         return id;

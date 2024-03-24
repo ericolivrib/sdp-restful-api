@@ -1,5 +1,6 @@
 package br.com.erico.tcc.sdp.model;
 
+import br.com.erico.tcc.sdp.enumeration.NaturezaEnum;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -15,6 +16,14 @@ public class Natureza {
     private String nome;
     @OneToMany(mappedBy = "natureza")
     private List<Demanda> demandas;
+
+    public Natureza() {
+    }
+
+    public Natureza(NaturezaEnum naturezaEnum) {
+        this.id = naturezaEnum.getId();
+        this.nome = naturezaEnum.getNome();
+    }
 
     public Integer getId() {
         return id;

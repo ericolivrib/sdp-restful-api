@@ -1,5 +1,6 @@
 package br.com.erico.tcc.sdp.model;
 
+import br.com.erico.tcc.sdp.enumeration.PeriodoEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -17,6 +18,14 @@ public class Periodo {
     private LocalDate dataInicio;
     @Column(name = "data_fim", nullable = false)
     private LocalDate dataFim;
+
+    public Periodo() {
+    }
+
+    public Periodo(PeriodoEnum periodoEnum) {
+        this.id = periodoEnum.getId();
+        this.nome = periodoEnum.getNome();
+    }
 
     public Integer getId() {
         return id;
