@@ -29,7 +29,7 @@ public class ProjetoController {
         try {
             return projetoService.getProjetosByUsuario(usuarioId);
         } catch (Exception e) {
-            LOGGER.error("Falha ao buscar projetos do usuário: {}", e.getMessage());
+            LOGGER.error(e.getMessage());
             return null;
         }
     }
@@ -41,7 +41,7 @@ public class ProjetoController {
         try {
             return projetoService.getProjetoById(projetoId);
         } catch (Exception e) {
-            LOGGER.error("Falha ao buscar por projeto: {}", e.getMessage());
+            LOGGER.error(e.getMessage());
             return null;
         }
     }

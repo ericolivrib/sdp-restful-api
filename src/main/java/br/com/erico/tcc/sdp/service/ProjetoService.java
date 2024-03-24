@@ -27,7 +27,7 @@ public class ProjetoService {
 
     public List<ProjetoUsuarioResponseDto> getProjetosByUsuario(UUID usuarioId) throws Exception{
         usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new Exception("Usuário de ID " + usuarioId + " não encontrado"));
+                .orElseThrow(() -> new Exception("Não foram encontrados usuários com ID " + usuarioId));
 
         var projetos = projetoRepository.findByUsuarioId(usuarioId);
 
@@ -43,7 +43,7 @@ public class ProjetoService {
         return entity.map(p -> new ProjetoResponseDto(p.getId(), p.getNumero(), p.getNome(), p.getModalidade(),
                         p.getJustificativa(), p.getDataCriacao(), p.getAno(), p.getStatus().getId(),
                         p.isPortalProjetos(), p.getDataFinalizacao(), p.getImpactosAmbientais()))
-                .orElseThrow(() -> new Exception("Projeto de ID " + projetoId + " não encontrado"));
+                .orElseThrow(() -> new Exception("Não foram encontrados projetos com ID " + projetoId));
     }
 
     public UUID addProjeto(NovoProjetoDto novoProjetoDto) {
