@@ -1,9 +1,6 @@
 package br.com.erico.tcc.sdp.service;
 
-import br.com.erico.tcc.sdp.dto.NovoProjetoDto;
-import br.com.erico.tcc.sdp.dto.ProjetoResponseDto;
-import br.com.erico.tcc.sdp.dto.ProjetoUsuarioResponseDto;
-import br.com.erico.tcc.sdp.dto.UpdateProjetoDto;
+import br.com.erico.tcc.sdp.dto.*;
 import br.com.erico.tcc.sdp.enumeration.PeriodoEnum;
 import br.com.erico.tcc.sdp.enumeration.StatusEnum;
 import br.com.erico.tcc.sdp.model.EixoTecnologico;
@@ -57,7 +54,7 @@ public class ProjetoService {
                 .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados projetos com ID " + projetoId));
     }
 
-    public UUID addProjeto(NovoProjetoDto novoProjetoDto) throws HttpClientErrorException, HttpServerErrorException {
+    public NovoProjetoResponseDto addProjeto(NovoProjetoDto novoProjetoDto) throws HttpClientErrorException, HttpServerErrorException {
         usuarioRepository.findById(novoProjetoDto.usuarioId())
                 .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados usuários com o ID " + novoProjetoDto.usuarioId()));
 
@@ -91,10 +88,10 @@ public class ProjetoService {
 
         var savedProjeto = projetoRepository.save(projeto);
 
-        return savedProjeto.getId();
+        return new NovoProjetoResponseDto(savedProjeto);
     }
 
-    public void updateProjeto(UpdateProjetoDto updateProjetoDto, UUID projetoId) throws HttpClientErrorException {
+    public UpdateProjetoResponseDto updateProjeto(UpdateProjetoDto updateProjetoDto, UUID projetoId) throws HttpClientErrorException {
         var projeto = projetoRepository.findById(projetoId)
                 .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados projetos com ID " + projetoId));
 
@@ -105,6 +102,8 @@ public class ProjetoService {
         projeto.setImpactosAmbientais(updateProjetoDto.impactosAmbientais() != null ? updateProjetoDto.impactosAmbientais() : projeto.getImpactosAmbientais());
 
         projetoRepository.save(projeto);
+
+        return new UpdateProjetoResponseDto(projeto);
     }
 
     public void deleteProjeto(UUID projetoId) throws HttpClientErrorException {
