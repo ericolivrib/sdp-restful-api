@@ -114,7 +114,7 @@ public class ProjetoService {
         if (!Objects.equals(projeto.getStatus().getId(), StatusEnum.NAO_FINALIZADO.getId()) &&
                 !Objects.equals(projeto.getStatus().getId(), StatusEnum.NAO_APROVADO.getId())) {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN,
-                    "Projetos com status " + projeto.getStatus().getId() + " (" + projeto.getStatus().getNome() + ") não podem ser deletados");
+                    "Projetos com status de valor " + projeto.getStatus().getId() + " (" + projeto.getStatus().getNome() + ") não podem ser deletados");
         }
 
         projetoRepository.delete(projeto);
