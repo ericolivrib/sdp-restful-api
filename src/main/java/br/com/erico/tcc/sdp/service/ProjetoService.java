@@ -35,7 +35,7 @@ public class ProjetoService {
 
     public List<ProjetoUsuarioResponseDto> getProjetosByUsuario(UUID usuarioId) throws HttpClientErrorException {
         usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados usuários com ID " + usuarioId));
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado"));
 
         var projetos = projetoRepository.findByUsuarioId(usuarioId);
 
@@ -56,7 +56,7 @@ public class ProjetoService {
 
     public NovoProjetoResponseDto addProjeto(NovoProjetoDto novoProjetoDto) throws HttpClientErrorException, HttpServerErrorException {
         usuarioRepository.findById(novoProjetoDto.usuarioId())
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados usuários com o ID " + novoProjetoDto.usuarioId()));
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado"));
 
         var periodoSubmissaoProjetos = periodoRepository.findById(PeriodoEnum.SUBMISSAO_PROJETOS.getId())
                 .orElseThrow(() -> new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Falha ao consultar período de submissão de projetos"));
