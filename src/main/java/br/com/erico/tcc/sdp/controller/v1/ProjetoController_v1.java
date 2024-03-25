@@ -1,9 +1,6 @@
 package br.com.erico.tcc.sdp.controller.v1;
 
-import br.com.erico.tcc.sdp.dto.NovoProjetoDto;
-import br.com.erico.tcc.sdp.dto.ProjetoResponseDto;
-import br.com.erico.tcc.sdp.dto.ProjetoUsuarioResponseDto;
-import br.com.erico.tcc.sdp.dto.UpdateProjetoDto;
+import br.com.erico.tcc.sdp.dto.*;
 import br.com.erico.tcc.sdp.service.ProjetoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +45,7 @@ public class ProjetoController_v1 {
     }
 
     @PostMapping
-    public UUID addProjeto(@RequestBody NovoProjetoDto novoProjetoDto) {
+    public NovoProjetoResponseDto addProjeto(@RequestBody NovoProjetoDto novoProjetoDto) {
         LOGGER.info("Adicionando projeto {}", novoProjetoDto.toString());
 
         try {

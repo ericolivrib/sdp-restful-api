@@ -1,10 +1,7 @@
 package br.com.erico.tcc.sdp.controller.v2;
 
 import br.com.erico.tcc.sdp.controller.v1.ProjetoController_v1;
-import br.com.erico.tcc.sdp.dto.NovoProjetoDto;
-import br.com.erico.tcc.sdp.dto.ProjetoResponseDto;
-import br.com.erico.tcc.sdp.dto.ProjetoUsuarioResponseDto;
-import br.com.erico.tcc.sdp.dto.UpdateProjetoDto;
+import br.com.erico.tcc.sdp.dto.*;
 import br.com.erico.tcc.sdp.service.ProjetoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,15 +54,15 @@ public class ProjetoController_v2 {
     }
 
     @PostMapping
-    public ResponseEntity<UUID> addProjeto(@RequestBody NovoProjetoDto novoProjetoDto) {
+    public ResponseEntity<NovoProjetoResponseDto> addProjeto(@RequestBody NovoProjetoDto novoProjetoDto) {
         LOGGER.info("Adicionando projeto {}", novoProjetoDto.toString());
 
         try {
-            var projetoId = projetoService.addProjeto(novoProjetoDto);
+            var novoProjetoResponseDto = projetoService.addProjeto(novoProjetoDto);
 
             var createdLocation = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{projetoId}")
-                    .buildAndExpand(projetoId)
+                    .buildAndExpand(novoProjetoResponseDto.id())
                     .toUri();
 
             return ResponseEntity.created(createdLocation).build();
