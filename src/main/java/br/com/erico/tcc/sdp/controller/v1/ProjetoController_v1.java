@@ -24,7 +24,7 @@ public class ProjetoController_v1 {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public List<ProjetoUsuarioResponseDto> getProjetosByUsuario(@PathVariable UUID usuarioId) {
+    public List<ProjetoUsuarioResponseDto> getProjetosByUsuario(@PathVariable("usuarioId") UUID usuarioId) {
         LOGGER.info("Buscando projetos do usuário {}", usuarioId);
 
         try {
@@ -60,7 +60,7 @@ public class ProjetoController_v1 {
     }
 
     @PutMapping("/{projetoId}")
-    public boolean updateProjeto(@RequestBody UpdateProjetoDto updateProjetoDto, @PathVariable UUID projetoId) {
+    public boolean updateProjeto(@RequestBody UpdateProjetoDto updateProjetoDto, @PathVariable("projetoId") UUID projetoId) {
         LOGGER.info("Atualizando dados do projeto {}", projetoId);
 
         try {
