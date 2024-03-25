@@ -14,12 +14,12 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/projetos")
-public class ProjetoController {
+public class ProjetoController_v1 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProjetoController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjetoController_v1.class);
     private final ProjetoService projetoService;
 
-    public ProjetoController(ProjetoService projetoService) {
+    public ProjetoController_v1(ProjetoService projetoService) {
         this.projetoService = projetoService;
     }
 
