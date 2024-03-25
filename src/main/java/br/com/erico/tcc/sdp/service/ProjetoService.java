@@ -13,7 +13,10 @@ import br.com.erico.tcc.sdp.model.Usuario;
 import br.com.erico.tcc.sdp.repository.PeriodoRepository;
 import br.com.erico.tcc.sdp.repository.ProjetoRepository;
 import br.com.erico.tcc.sdp.repository.UsuarioRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,9 +36,9 @@ public class ProjetoService {
         this.periodoRepository = periodoRepository;
     }
 
-    public List<ProjetoUsuarioResponseDto> getProjetosByUsuario(UUID usuarioId) throws Exception {
+    public List<ProjetoUsuarioResponseDto> getProjetosByUsuario(UUID usuarioId) throws HttpClientErrorException {
         usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new Exception("Não foram encontrados usuários com ID " + usuarioId));
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados usuários com ID " + usuarioId));
 
         var projetos = projetoRepository.findByUsuarioId(usuarioId);
 
@@ -45,25 +48,25 @@ public class ProjetoService {
                 .toList();
     }
 
-    public ProjetoResponseDto getProjetoById(UUID projetoId) throws Exception {
-        var entity = projetoRepository.findById(projetoId);
+    public ProjetoResponseDto getProjetoById(UUID projetoId) throws HttpClientErrorException {
+        var projeto = projetoRepository.findById(projetoId);
 
-        return entity.map(p -> new ProjetoResponseDto(p.getId(), p.getNumero(), p.getNome(), p.getModalidade(),
+        return projeto.map(p -> new ProjetoResponseDto(p.getId(), p.getNumero(), p.getNome(), p.getModalidade(),
                         p.getJustificativa(), p.getDataCriacao(), p.getAno(), p.getStatus().getId(),
                         p.isPortalProjetos(), p.getDataFinalizacao(), p.getImpactosAmbientais()))
-                .orElseThrow(() -> new Exception("Não foram encontrados projetos com ID " + projetoId));
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados projetos com ID " + projetoId));
     }
 
-    public UUID addProjeto(NovoProjetoDto novoProjetoDto) throws Exception {
+    public UUID addProjeto(NovoProjetoDto novoProjetoDto) throws HttpClientErrorException, HttpServerErrorException {
         usuarioRepository.findById(novoProjetoDto.usuarioId())
-                .orElseThrow(() -> new Exception("Não foram encontrados usuários com o ID " + novoProjetoDto.usuarioId()));
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados usuários com o ID " + novoProjetoDto.usuarioId()));
 
         var periodoSubmissaoProjetos = periodoRepository.findById(PeriodoEnum.SUBMISSAO_PROJETOS.getId())
-                .orElseThrow(() -> new Exception("Falha ao consultar período de submissão de projetos"));
+                .orElseThrow(() -> new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Falha ao consultar período de submissão de projetos"));
 
         if (periodoSubmissaoProjetos.getDataInicio().isAfter(LocalDate.now()) ||
                 periodoSubmissaoProjetos.getDataFim().isBefore(LocalDate.now())) {
-            throw new Exception("Fora do prazo de submissão de projetos");
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Fora do prazo de submissão de projetos");
         }
 
         var usuario = new Usuario();
@@ -91,9 +94,9 @@ public class ProjetoService {
         return savedProjeto.getId();
     }
 
-    public void updateProjeto(UpdateProjetoDto updateProjetoDto, UUID projetoId) throws Exception {
+    public void updateProjeto(UpdateProjetoDto updateProjetoDto, UUID projetoId) throws HttpClientErrorException {
         var projeto = projetoRepository.findById(projetoId)
-                .orElseThrow(() -> new Exception("Não foram encontrados projetos com ID " + projetoId));
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados projetos com ID " + projetoId));
 
         projeto.setNumero(updateProjetoDto.numero() != null ? updateProjetoDto.numero() : projeto.getNumero());
         projeto.setNome(updateProjetoDto.nome() != null ? updateProjetoDto.nome().toUpperCase() : projeto.getNome());
@@ -104,13 +107,14 @@ public class ProjetoService {
         projetoRepository.save(projeto);
     }
 
-    public void deleteProjeto(UUID projetoId) throws Exception {
+    public void deleteProjeto(UUID projetoId) throws HttpClientErrorException {
         var projeto = projetoRepository.findById(projetoId)
-                .orElseThrow(() -> new Exception("Não foram encontrados projetos com ID " + projetoId));
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados projetos com ID " + projetoId));
 
         if (!Objects.equals(projeto.getStatus().getId(), StatusEnum.NAO_FINALIZADO.getId()) &&
                 !Objects.equals(projeto.getStatus().getId(), StatusEnum.NAO_APROVADO.getId())) {
-            throw new Exception("Projetos com status " + projeto.getStatus().getId() + " (" + projeto.getStatus().getNome() + ") não podem ser deletados");
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN,
+                    "Projetos com status " + projeto.getStatus().getId() + " (" + projeto.getStatus().getNome() + ") não podem ser deletados");
         }
 
         projetoRepository.delete(projeto);
