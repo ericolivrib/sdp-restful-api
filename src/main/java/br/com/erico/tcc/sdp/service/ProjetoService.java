@@ -40,7 +40,7 @@ public class ProjetoService {
         var projetos = projetoRepository.findByUsuarioId(usuarioId);
 
         return projetos.stream()
-                .map(p -> new ProjetoUsuarioResponseDto(p.getId(), p.getNumero(), p.getNome(), p.getModalidade(),
+                .map(p -> new ProjetoUsuarioResponseDto(p.getId(), usuarioId, p.getNumero(), p.getNome(), p.getModalidade(),
                         p.getDataCriacao(), p.getAno(), p.getStatus().getId(), p.isFinalizado(), p.getDataFinalizacao()))
                 .toList();
     }
