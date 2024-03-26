@@ -1,5 +1,6 @@
 package br.com.erico.tcc.sdp.controller.v3;
 
+import br.com.erico.tcc.sdp.assembler.ProjetoUsuarioModelAssembler;
 import br.com.erico.tcc.sdp.dto.*;
 import br.com.erico.tcc.sdp.enumeration.StatusEnum;
 import br.com.erico.tcc.sdp.service.ProjetoService;
@@ -26,9 +27,11 @@ public class ProjetoController_v3 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjetoController_v3.class);
     private final ProjetoService projetoService;
+    private final ProjetoUsuarioModelAssembler projetoUsuarioModelAssembler;
 
-    public ProjetoController_v3(ProjetoService projetoService) {
+    public ProjetoController_v3(ProjetoService projetoService, ProjetoUsuarioModelAssembler projetoUsuarioModelAssembler) {
         this.projetoService = projetoService;
+        this.projetoUsuarioModelAssembler = projetoUsuarioModelAssembler;
     }
 
     @GetMapping("/usuario/{usuarioId}")
@@ -36,26 +39,8 @@ public class ProjetoController_v3 {
         LOGGER.info("Buscando projetos do usuário {}", usuarioId);
 
         try {
-            var projetos = CollectionModel.of(projetoService.getProjetosByUsuario(usuarioId).stream()
-                    .map(p -> {
-                        var em = EntityModel.of(p);
-                        em.add(linkTo(methodOn(ProjetoController_v3.class).getProjetoById(p.id())).withRel(IanaLinkRelations.ITEM));
-                        em.add(linkTo(methodOn(ProjetoController_v3.class).updateProjeto(null, p.id())).withRel(IanaLinkRelations.EDIT));
-
-                        if (Objects.equals(p.statusId(), StatusEnum.NAO_FINALIZADO.getId()) ||
-                                Objects.equals(p.statusId(), StatusEnum.NAO_APROVADO.getId())) {
-                            em.add(linkTo(methodOn(ProjetoController_v3.class).deleteProjeto(p.id())).withRel("delete"));
-                        }
-
-                        return em;
-                    })
-                    .collect(Collectors.toList()));
-
-            projetos.add(linkTo(methodOn(ProjetoController_v3.class).getProjetosByUsuario(usuarioId)).withSelfRel());
-
-            if (projetos.getContent().isEmpty()) {
-                projetos.add(linkTo(methodOn(ProjetoController_v3.class).addProjeto(null)).withRel("create"));
-            }
+            var projetoList = projetoService.getProjetosByUsuario(usuarioId);
+            var projetos = projetoUsuarioModelAssembler.toCollectionModel(projetoList);
 
             return ResponseEntity.ok(projetos);
         } catch (HttpClientErrorException e) {
