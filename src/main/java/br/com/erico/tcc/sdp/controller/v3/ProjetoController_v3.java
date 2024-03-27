@@ -1,6 +1,5 @@
 package br.com.erico.tcc.sdp.controller.v3;
 
-import br.com.erico.tcc.sdp.assembler.ProjetoUsuarioModelAssembler;
 import br.com.erico.tcc.sdp.dto.*;
 import br.com.erico.tcc.sdp.enumeration.StatusEnum;
 import br.com.erico.tcc.sdp.service.ProjetoService;
@@ -27,11 +26,9 @@ public class ProjetoController_v3 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjetoController_v3.class);
     private final ProjetoService projetoService;
-    private final ProjetoUsuarioModelAssembler projetoUsuarioModelAssembler;
 
-    public ProjetoController_v3(ProjetoService projetoService, ProjetoUsuarioModelAssembler projetoUsuarioModelAssembler) {
+    public ProjetoController_v3(ProjetoService projetoService) {
         this.projetoService = projetoService;
-        this.projetoUsuarioModelAssembler = projetoUsuarioModelAssembler;
     }
 
     @GetMapping("/usuario/{usuarioId}")
@@ -40,7 +37,25 @@ public class ProjetoController_v3 {
 
         try {
             var projetoList = projetoService.getProjetosByUsuario(usuarioId);
-            var projetos = projetoUsuarioModelAssembler.toCollectionModel(projetoList);
+
+            var projetos = CollectionModel.of(projetoList.stream().map(p -> {
+                var entity = EntityModel.of(p);
+                entity.add(linkTo(methodOn(ProjetoController_v3.class).getProjetoById(p.id())).withRel(IanaLinkRelations.ITEM));
+
+                if (Objects.equals(p.statusId(), StatusEnum.NAO_FINALIZADO.getId()) ||
+                        Objects.equals(p.statusId(), StatusEnum.NAO_APROVADO.getId())) {
+                    entity.add(linkTo(methodOn(ProjetoController_v3.class).deleteProjeto(p.id())).withRel("delete"));
+                    entity.add(linkTo(methodOn(ProjetoController_v3.class).updateProjeto(null, p.id())).withRel(IanaLinkRelations.EDIT));
+                }
+
+                return entity;
+            }).toList());
+
+            projetos.add(linkTo(methodOn(ProjetoController_v3.class).getProjetosByUsuario(usuarioId)).withSelfRel());
+
+            if (projetoList.isEmpty()) {
+                projetos.add(linkTo(methodOn(ProjetoController_v3.class).addProjeto(null)).withRel("create"));
+            }
 
             return ResponseEntity.ok(projetos);
         } catch (HttpClientErrorException e) {
