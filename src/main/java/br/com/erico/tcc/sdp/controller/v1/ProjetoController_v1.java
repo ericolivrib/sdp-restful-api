@@ -45,11 +45,11 @@ public class ProjetoController_v1 {
     }
 
     @PostMapping
-    public NovoProjetoResponseDto addProjeto(@RequestBody NovoProjetoDto novoProjetoDto) {
-        LOGGER.info("Adicionando projeto {}", novoProjetoDto.toString());
+    public ProjetoAdicionadoResponseDto addProjeto(@RequestBody AdicionarProjetoDto adicionarProjetoDto) {
+        LOGGER.info("Adicionando projeto {}", adicionarProjetoDto.toString());
 
         try {
-            return projetoService.addProjeto(novoProjetoDto);
+            return projetoService.addProjeto(adicionarProjetoDto);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             return null;
@@ -57,11 +57,11 @@ public class ProjetoController_v1 {
     }
 
     @PutMapping("/{projetoId}")
-    public boolean updateProjeto(@RequestBody UpdateProjetoDto updateProjetoDto, @PathVariable("projetoId") UUID projetoId) {
+    public boolean updateProjeto(@RequestBody AtualizarProjetoDto atualizarProjetoDto, @PathVariable("projetoId") UUID projetoId) {
         LOGGER.info("Atualizando dados do projeto {}", projetoId);
 
         try {
-            projetoService.updateProjeto(updateProjetoDto, projetoId);
+            projetoService.updateProjeto(atualizarProjetoDto, projetoId);
             return true;
         } catch (Exception e) {
             LOGGER.error(e.getMessage());

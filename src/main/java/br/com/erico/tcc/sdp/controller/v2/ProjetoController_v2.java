@@ -54,11 +54,11 @@ public class ProjetoController_v2 {
     }
 
     @PostMapping
-    public ResponseEntity<NovoProjetoResponseDto> addProjeto(@RequestBody NovoProjetoDto novoProjetoDto) {
-        LOGGER.info("Adicionando projeto {}", novoProjetoDto.toString());
+    public ResponseEntity<ProjetoAdicionadoResponseDto> addProjeto(@RequestBody AdicionarProjetoDto adicionarProjetoDto) {
+        LOGGER.info("Adicionando projeto {}", adicionarProjetoDto.toString());
 
         try {
-            var novoProjetoResponseDto = projetoService.addProjeto(novoProjetoDto);
+            var novoProjetoResponseDto = projetoService.addProjeto(adicionarProjetoDto);
 
             var createdLocation = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{projetoId}")
@@ -73,11 +73,11 @@ public class ProjetoController_v2 {
     }
 
     @PutMapping("/{projetoId}")
-    public ResponseEntity<Void> updateProjeto(@RequestBody UpdateProjetoDto updateProjetoDto, @PathVariable("projetoId") UUID projetoId) {
+    public ResponseEntity<Void> updateProjeto(@RequestBody AtualizarProjetoDto atualizarProjetoDto, @PathVariable("projetoId") UUID projetoId) {
         LOGGER.info("Atualizando dados do projeto {}", projetoId);
 
         try {
-            projetoService.updateProjeto(updateProjetoDto, projetoId);
+            projetoService.updateProjeto(atualizarProjetoDto, projetoId);
             return ResponseEntity.noContent().build();
         } catch (HttpClientErrorException e) {
             LOGGER.error(e.getStatusText());

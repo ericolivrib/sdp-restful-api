@@ -54,8 +54,8 @@ public class ProjetoService {
                 .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados projetos com ID " + projetoId));
     }
 
-    public NovoProjetoResponseDto addProjeto(NovoProjetoDto novoProjetoDto) throws HttpClientErrorException, HttpServerErrorException {
-        usuarioRepository.findById(novoProjetoDto.usuarioId())
+    public ProjetoAdicionadoResponseDto addProjeto(AdicionarProjetoDto adicionarProjetoDto) throws HttpClientErrorException, HttpServerErrorException {
+        usuarioRepository.findById(adicionarProjetoDto.usuarioId())
                 .orElseThrow(() -> new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado"));
 
         var periodoSubmissaoProjetos = periodoRepository.findById(PeriodoEnum.SUBMISSAO_PROJETOS.getId())
@@ -66,24 +66,24 @@ public class ProjetoService {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Fora do prazo de submissão de projetos");
         }
 
-        if (projetoRepository.existsByNumero(novoProjetoDto.numero())) {
+        if (projetoRepository.existsByNumero(adicionarProjetoDto.numero())) {
             throw new HttpClientErrorException(HttpStatus.CONFLICT, "Número de projeto já existente");
         }
 
         var usuario = new Usuario();
-        usuario.setId(novoProjetoDto.usuarioId());
+        usuario.setId(adicionarProjetoDto.usuarioId());
 
         var eixoTecnologico = new EixoTecnologico();
-        eixoTecnologico.setId(novoProjetoDto.eixoTecnologicoId());
+        eixoTecnologico.setId(adicionarProjetoDto.eixoTecnologicoId());
 
         var status = new Status(StatusEnum.NAO_FINALIZADO);
 
         var projeto = new Projeto();
-        projeto.setNumero(novoProjetoDto.numero());
-        projeto.setNome(novoProjetoDto.nome().toUpperCase());
-        projeto.setModalidade(novoProjetoDto.modalidade());
-        projeto.setJustificativa(novoProjetoDto.justificativa());
-        projeto.setImpactosAmbientais(novoProjetoDto.impactosAmbientais());
+        projeto.setNumero(adicionarProjetoDto.numero());
+        projeto.setNome(adicionarProjetoDto.nome().toUpperCase());
+        projeto.setModalidade(adicionarProjetoDto.modalidade());
+        projeto.setJustificativa(adicionarProjetoDto.justificativa());
+        projeto.setImpactosAmbientais(adicionarProjetoDto.impactosAmbientais());
         projeto.setDataCriacao(LocalDate.now());
         projeto.setAno((short) LocalDate.now().getYear());
         projeto.setUsuario(usuario);
@@ -92,22 +92,22 @@ public class ProjetoService {
 
         var savedProjeto = projetoRepository.save(projeto);
 
-        return new NovoProjetoResponseDto(savedProjeto);
+        return new ProjetoAdicionadoResponseDto(savedProjeto);
     }
 
-    public UpdateProjetoResponseDto updateProjeto(UpdateProjetoDto updateProjetoDto, UUID projetoId) throws HttpClientErrorException {
+    public ProjetoAtualizadoResponseDto updateProjeto(AtualizarProjetoDto atualizarProjetoDto, UUID projetoId) throws HttpClientErrorException {
         var projeto = projetoRepository.findById(projetoId)
                 .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados projetos com ID " + projetoId));
 
-        projeto.setNumero(updateProjetoDto.numero() != null ? updateProjetoDto.numero() : projeto.getNumero());
-        projeto.setNome(updateProjetoDto.nome() != null ? updateProjetoDto.nome().toUpperCase() : projeto.getNome());
-        projeto.setModalidade(updateProjetoDto.modalidade() != null ? updateProjetoDto.modalidade() : projeto.getModalidade());
-        projeto.setJustificativa(updateProjetoDto.justificativa() != null ? updateProjetoDto.justificativa() : projeto.getJustificativa());
-        projeto.setImpactosAmbientais(updateProjetoDto.impactosAmbientais() != null ? updateProjetoDto.impactosAmbientais() : projeto.getImpactosAmbientais());
+        projeto.setNumero(atualizarProjetoDto.numero() != null ? atualizarProjetoDto.numero() : projeto.getNumero());
+        projeto.setNome(atualizarProjetoDto.nome() != null ? atualizarProjetoDto.nome().toUpperCase() : projeto.getNome());
+        projeto.setModalidade(atualizarProjetoDto.modalidade() != null ? atualizarProjetoDto.modalidade() : projeto.getModalidade());
+        projeto.setJustificativa(atualizarProjetoDto.justificativa() != null ? atualizarProjetoDto.justificativa() : projeto.getJustificativa());
+        projeto.setImpactosAmbientais(atualizarProjetoDto.impactosAmbientais() != null ? atualizarProjetoDto.impactosAmbientais() : projeto.getImpactosAmbientais());
 
         projetoRepository.save(projeto);
 
-        return new UpdateProjetoResponseDto(projeto);
+        return new ProjetoAtualizadoResponseDto(projeto);
     }
 
     public void deleteProjeto(UUID projetoId) throws HttpClientErrorException {
