@@ -63,7 +63,7 @@ public class ProjetoService {
 
         if (periodoSubmissaoProjetos.getDataInicio().isAfter(LocalDate.now()) ||
                 periodoSubmissaoProjetos.getDataFim().isBefore(LocalDate.now())) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Fora do prazo de submissão de projetos");
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Fora do prazo de submissão de projetos");
         }
 
         var usuario = new Usuario();
