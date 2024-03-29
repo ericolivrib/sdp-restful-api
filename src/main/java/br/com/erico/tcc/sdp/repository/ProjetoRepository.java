@@ -12,4 +12,6 @@ public interface ProjetoRepository extends JpaRepository<Projeto, UUID> {
 
     List<Projeto> findByUsuarioId(UUID usuario_id);
 
+    boolean existsByNumero(String numero);
+
 }
