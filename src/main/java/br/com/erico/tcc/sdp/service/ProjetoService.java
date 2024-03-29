@@ -66,6 +66,10 @@ public class ProjetoService {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Fora do prazo de submissão de projetos");
         }
 
+        if (projetoRepository.existsByNumero(novoProjetoDto.numero())) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Número de projeto já existente");
+        }
+
         var usuario = new Usuario();
         usuario.setId(novoProjetoDto.usuarioId());
 
