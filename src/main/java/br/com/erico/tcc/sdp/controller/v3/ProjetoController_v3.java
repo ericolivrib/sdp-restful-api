@@ -65,7 +65,8 @@ public class ProjetoController_v3 {
         LOGGER.info("Buscando projeto {}", projetoId);
 
         try {
-            var projeto = projetoModelAssembler.toModel(projetoService.getProjetoById(projetoId));
+            var projetoEncontrado = projetoService.getProjetoById(projetoId);
+            var projeto = projetoModelAssembler.toModel(projetoEncontrado);
             return ResponseEntity.ok(projeto);
         } catch (HttpClientErrorException e) {
             LOGGER.error(e.getStatusText());
@@ -78,13 +79,12 @@ public class ProjetoController_v3 {
         LOGGER.info("Adicionando projeto {}", novoProjetoDto.toString());
 
         try {
-            var proj = projetoService.addProjeto(novoProjetoDto);
-
-            var projeto = novoProjetoModelAssembler.toModel(proj);
+            var novoProjeto = projetoService.addProjeto(novoProjetoDto);
+            var projeto = novoProjetoModelAssembler.toModel(novoProjeto);
 
             var createdLocation = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{projetoId}")
-                    .buildAndExpand(proj.id())
+                    .buildAndExpand(novoProjeto.id())
                     .toUri();
 
             return ResponseEntity.created(createdLocation).body(projeto);
@@ -99,7 +99,8 @@ public class ProjetoController_v3 {
         LOGGER.info("Atualizando dados do projeto {}", projetoId);
 
         try {
-            var projeto = updateProjetoModelAssembler.toModel(projetoService.updateProjeto(updateProjetoDto, projetoId));
+            var projetoAtualizado = projetoService.updateProjeto(updateProjetoDto, projetoId);
+            var projeto = updateProjetoModelAssembler.toModel(projetoAtualizado);
             return ResponseEntity.ok(projeto);
         } catch (HttpClientErrorException e) {
             LOGGER.error(e.getStatusText());
