@@ -1,5 +1,9 @@
 package br.com.erico.tcc.sdp.controller.v3;
 
+import br.com.erico.tcc.sdp.assembler.NovoProjetoModelAssembler;
+import br.com.erico.tcc.sdp.assembler.ProjetoModelAssembler;
+import br.com.erico.tcc.sdp.assembler.ProjetoUsuarioModelAssembler;
+import br.com.erico.tcc.sdp.assembler.UpdateProjetoModelAssembler;
 import br.com.erico.tcc.sdp.dto.*;
 import br.com.erico.tcc.sdp.enumeration.StatusEnum;
 import br.com.erico.tcc.sdp.service.ProjetoService;
@@ -12,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -26,9 +31,17 @@ public class ProjetoController_v3 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjetoController_v3.class);
     private final ProjetoService projetoService;
+    private final ProjetoUsuarioModelAssembler projetoUsuarioModelAssembler;
+    private final ProjetoModelAssembler projetoModelAssembler;
+    private final NovoProjetoModelAssembler novoProjetoModelAssembler;
+    private final UpdateProjetoModelAssembler updateProjetoModelAssembler;
 
-    public ProjetoController_v3(ProjetoService projetoService) {
+    public ProjetoController_v3(ProjetoService projetoService, ProjetoUsuarioModelAssembler projetoUsuarioModelAssembler, ProjetoModelAssembler projetoModelAssembler, NovoProjetoModelAssembler novoProjetoModelAssembler, UpdateProjetoModelAssembler updateProjetoModelAssembler) {
         this.projetoService = projetoService;
+        this.projetoUsuarioModelAssembler = projetoUsuarioModelAssembler;
+        this.projetoModelAssembler = projetoModelAssembler;
+        this.novoProjetoModelAssembler = novoProjetoModelAssembler;
+        this.updateProjetoModelAssembler = updateProjetoModelAssembler;
     }
 
     @GetMapping("/usuario/{usuarioId}")
@@ -37,25 +50,7 @@ public class ProjetoController_v3 {
 
         try {
             var projetoList = projetoService.getProjetosByUsuario(usuarioId);
-
-            var projetos = CollectionModel.of(projetoList.stream().map(p -> {
-                var entity = EntityModel.of(p);
-                entity.add(linkTo(methodOn(ProjetoController_v3.class).getProjetoById(p.id())).withRel(IanaLinkRelations.ITEM));
-
-                if (Objects.equals(p.statusId(), StatusEnum.NAO_FINALIZADO.getId()) ||
-                        Objects.equals(p.statusId(), StatusEnum.NAO_APROVADO.getId())) {
-                    entity.add(linkTo(methodOn(ProjetoController_v3.class).deleteProjeto(p.id())).withRel("delete"));
-                    entity.add(linkTo(methodOn(ProjetoController_v3.class).updateProjeto(null, p.id())).withRel(IanaLinkRelations.EDIT));
-                }
-
-                return entity;
-            }).toList());
-
-            projetos.add(linkTo(methodOn(ProjetoController_v3.class).getProjetosByUsuario(usuarioId)).withSelfRel());
-
-            if (projetoList.isEmpty()) {
-                projetos.add(linkTo(methodOn(ProjetoController_v3.class).addProjeto(null)).withRel("create"));
-            }
+            var projetos = projetoUsuarioModelAssembler.toCollection(projetoList, usuarioId);
 
             return ResponseEntity.ok(projetos);
         } catch (HttpClientErrorException e) {
@@ -70,15 +65,7 @@ public class ProjetoController_v3 {
         LOGGER.info("Buscando projeto {}", projetoId);
 
         try {
-            var projeto = EntityModel.of(projetoService.getProjetoById(projetoId));
-            projeto.add(linkTo(methodOn(ProjetoController_v3.class).getProjetoById(projetoId)).withSelfRel());
-
-            if (Objects.equals(projeto.getContent().statusId(), StatusEnum.NAO_FINALIZADO.getId()) ||
-                    Objects.equals(projeto.getContent().statusId(), StatusEnum.NAO_APROVADO.getId())) {
-                projeto.add(linkTo(methodOn(ProjetoController_v3.class).deleteProjeto(projeto.getContent().id())).withRel("delete"));
-                projeto.add(linkTo(methodOn(ProjetoController_v3.class).updateProjeto(null, projeto.getContent().id())).withRel(IanaLinkRelations.EDIT));
-            }
-
+            var projeto = projetoModelAssembler.toModel(projetoService.getProjetoById(projetoId));
             return ResponseEntity.ok(projeto);
         } catch (HttpClientErrorException e) {
             LOGGER.error(e.getStatusText());
@@ -91,14 +78,13 @@ public class ProjetoController_v3 {
         LOGGER.info("Adicionando projeto {}", novoProjetoDto.toString());
 
         try {
-            var projeto = EntityModel.of(projetoService.addProjeto(novoProjetoDto));
+            var proj = projetoService.addProjeto(novoProjetoDto);
 
-            projeto.add(linkTo(methodOn(ProjetoController_v3.class).addProjeto(novoProjetoDto)).withSelfRel());
-            projeto.add(linkTo(methodOn(ProjetoController_v3.class).getProjetoById(projeto.getContent().id())).withRel(IanaLinkRelations.RELATED));
-            projeto.add(linkTo(methodOn(ProjetoController_v3.class).updateProjeto(null, projeto.getContent().id())).withRel(IanaLinkRelations.EDIT));
-            projeto.add(linkTo(methodOn(ProjetoController_v3.class).deleteProjeto(projeto.getContent().id())).withRel("delete"));
+            var projeto = novoProjetoModelAssembler.toModel(proj);
 
-            var createdLocation = linkTo(methodOn(ProjetoController_v3.class).getProjetoById(projeto.getContent().id()))
+            var createdLocation = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{projetoId}")
+                    .buildAndExpand(proj.id())
                     .toUri();
 
             return ResponseEntity.created(createdLocation).body(projeto);
@@ -113,12 +99,7 @@ public class ProjetoController_v3 {
         LOGGER.info("Atualizando dados do projeto {}", projetoId);
 
         try {
-            var projeto = EntityModel.of(projetoService.updateProjeto(updateProjetoDto, projetoId));
-
-            projeto.add(linkTo(methodOn(ProjetoController_v3.class).updateProjeto(updateProjetoDto, projetoId)).withSelfRel());
-            projeto.add(linkTo(methodOn(ProjetoController_v3.class).getProjetoById(projeto.getContent().id())).withRel(IanaLinkRelations.RELATED));
-            projeto.add(linkTo(methodOn(ProjetoController_v3.class).deleteProjeto(projeto.getContent().id())).withRel("delete"));
-
+            var projeto = updateProjetoModelAssembler.toModel(projetoService.updateProjeto(updateProjetoDto, projetoId));
             return ResponseEntity.ok(projeto);
         } catch (HttpClientErrorException e) {
             LOGGER.error(e.getStatusText());
