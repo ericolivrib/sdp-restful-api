@@ -67,7 +67,7 @@ public class ProjetoService {
         }
 
         if (projetoRepository.existsByNumero(novoProjetoDto.numero())) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Número de projeto já existente");
+            throw new HttpClientErrorException(HttpStatus.CONFLICT, "Número de projeto já existente");
         }
 
         var usuario = new Usuario();
