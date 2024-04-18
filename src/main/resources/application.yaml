@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: sdp-restful
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/sdp_tcc
+    username: postgres
+    password: 1234
+  jpa:
+    show-sql: true
