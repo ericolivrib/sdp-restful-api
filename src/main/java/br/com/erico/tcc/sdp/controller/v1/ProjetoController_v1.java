@@ -1,6 +1,10 @@
 package br.com.erico.tcc.sdp.controller.v1;
 
-import br.com.erico.tcc.sdp.dto.*;
+import br.com.erico.tcc.sdp.dto.request.CreateProjetoRequest;
+import br.com.erico.tcc.sdp.dto.request.UpdateProjetoRequest;
+import br.com.erico.tcc.sdp.dto.response.CreateProjetoResponse;
+import br.com.erico.tcc.sdp.dto.response.GetProjetoByIdResponse;
+import br.com.erico.tcc.sdp.dto.response.GetProjetoUsuarioResponse;
 import br.com.erico.tcc.sdp.service.ProjetoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +25,7 @@ public class ProjetoController_v1 {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public List<ProjetoUsuarioResponseDto> getProjetosByUsuario(@PathVariable("usuarioId") UUID usuarioId) {
+    public List<GetProjetoUsuarioResponse> getProjetosByUsuario(@PathVariable("usuarioId") UUID usuarioId) {
         LOGGER.info("Buscando projetos do usuário {}", usuarioId);
 
         try {
@@ -33,7 +37,7 @@ public class ProjetoController_v1 {
     }
 
     @GetMapping("/{projetoId}")
-    public ProjetoResponseDto getProjetoById(@PathVariable("projetoId") UUID projetoId) {
+    public GetProjetoByIdResponse getProjetoById(@PathVariable("projetoId") UUID projetoId) {
         LOGGER.info("Buscando projeto {}", projetoId);
 
         try {
@@ -45,11 +49,11 @@ public class ProjetoController_v1 {
     }
 
     @PostMapping
-    public ProjetoAdicionadoResponseDto addProjeto(@RequestBody AdicionarProjetoDto adicionarProjetoDto) {
-        LOGGER.info("Adicionando projeto {}", adicionarProjetoDto.toString());
+    public CreateProjetoResponse addProjeto(@RequestBody CreateProjetoRequest createProjetoRequest) {
+        LOGGER.info("Adicionando projeto {}", createProjetoRequest.toString());
 
         try {
-            return projetoService.addProjeto(adicionarProjetoDto);
+            return projetoService.addProjeto(createProjetoRequest);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             return null;
@@ -57,11 +61,11 @@ public class ProjetoController_v1 {
     }
 
     @PutMapping("/{projetoId}")
-    public boolean updateProjeto(@RequestBody AtualizarProjetoDto atualizarProjetoDto, @PathVariable("projetoId") UUID projetoId) {
+    public boolean updateProjeto(@RequestBody UpdateProjetoRequest updateProjetoRequest, @PathVariable("projetoId") UUID projetoId) {
         LOGGER.info("Atualizando dados do projeto {}", projetoId);
 
         try {
-            projetoService.updateProjeto(atualizarProjetoDto, projetoId);
+            projetoService.updateProjeto(updateProjetoRequest, projetoId);
             return true;
         } catch (Exception e) {
             LOGGER.error(e.getMessage());

@@ -1,9 +1,8 @@
 package br.com.erico.tcc.sdp.assembler;
 
 import br.com.erico.tcc.sdp.controller.v3.ProjetoController_v3;
-import br.com.erico.tcc.sdp.dto.ProjetoResponseDto;
+import br.com.erico.tcc.sdp.dto.response.GetProjetoByIdResponse;
 import br.com.erico.tcc.sdp.enumeration.StatusEnum;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -15,10 +14,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class ProjetoModelAssembler implements RepresentationModelAssembler<ProjetoResponseDto, EntityModel<ProjetoResponseDto>> {
+public class ProjetoModelAssembler implements RepresentationModelAssembler<GetProjetoByIdResponse, EntityModel<GetProjetoByIdResponse>> {
 
     @Override
-    public EntityModel<ProjetoResponseDto> toModel(ProjetoResponseDto entity) {
+    public EntityModel<GetProjetoByIdResponse> toModel(GetProjetoByIdResponse entity) {
         var entityModel = EntityModel.of(entity);
         entityModel.add(linkTo(methodOn(ProjetoController_v3.class).getProjetoById(entity.id())).withSelfRel());
 

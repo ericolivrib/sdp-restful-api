@@ -1,7 +1,7 @@
 package br.com.erico.tcc.sdp.controller.v3;
 
 import br.com.erico.tcc.sdp.assembler.RootEntryPointModelAssembler;
-import br.com.erico.tcc.sdp.dto.RootEntryPointDto;
+import br.com.erico.tcc.sdp.dto.response.RootEntryPointResponse;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +19,8 @@ public class RootEntryPointController {
     }
 
     @GetMapping
-    public ResponseEntity<EntityModel<RootEntryPointDto>> root() {
-        var rootEntryPoint = rootEntryPointModelAssembler.toModel(new RootEntryPointDto());
+    public ResponseEntity<EntityModel<RootEntryPointResponse>> root() {
+        var rootEntryPoint = rootEntryPointModelAssembler.toModel(new RootEntryPointResponse());
         return ResponseEntity.ok(rootEntryPoint);
     }
 

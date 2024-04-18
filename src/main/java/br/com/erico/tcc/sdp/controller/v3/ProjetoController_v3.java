@@ -4,7 +4,12 @@ import br.com.erico.tcc.sdp.assembler.ProjetoAdicionadoModelAssembler;
 import br.com.erico.tcc.sdp.assembler.ProjetoModelAssembler;
 import br.com.erico.tcc.sdp.assembler.ProjetoUsuarioModelAssembler;
 import br.com.erico.tcc.sdp.assembler.ProjetoAtualizadoModelAssembler;
-import br.com.erico.tcc.sdp.dto.*;
+import br.com.erico.tcc.sdp.dto.request.CreateProjetoRequest;
+import br.com.erico.tcc.sdp.dto.request.UpdateProjetoRequest;
+import br.com.erico.tcc.sdp.dto.response.CreateProjetoResponse;
+import br.com.erico.tcc.sdp.dto.response.GetProjetoByIdResponse;
+import br.com.erico.tcc.sdp.dto.response.GetProjetoUsuarioResponse;
+import br.com.erico.tcc.sdp.dto.response.UpdateProjetoResponse;
 import br.com.erico.tcc.sdp.service.ProjetoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +43,7 @@ public class ProjetoController_v3 {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<CollectionModel<EntityModel<ProjetoUsuarioResponseDto>>> getProjetosByUsuario(@PathVariable("usuarioId") UUID usuarioId) {
+    public ResponseEntity<CollectionModel<EntityModel<GetProjetoUsuarioResponse>>> getProjetosByUsuario(@PathVariable("usuarioId") UUID usuarioId) {
         LOGGER.info("Buscando projetos do usuário {}", usuarioId);
 
         try {
@@ -54,7 +59,7 @@ public class ProjetoController_v3 {
     }
 
     @GetMapping("/{projetoId}")
-    public ResponseEntity<EntityModel<ProjetoResponseDto>> getProjetoById(@PathVariable("projetoId") UUID projetoId) {
+    public ResponseEntity<EntityModel<GetProjetoByIdResponse>> getProjetoById(@PathVariable("projetoId") UUID projetoId) {
         LOGGER.info("Buscando projeto {}", projetoId);
 
         try {
@@ -68,11 +73,11 @@ public class ProjetoController_v3 {
     }
 
     @PostMapping
-    public ResponseEntity<EntityModel<ProjetoAdicionadoResponseDto>> addProjeto(@RequestBody AdicionarProjetoDto adicionarProjetoDto) {
-        LOGGER.info("Adicionando projeto {}", adicionarProjetoDto.toString());
+    public ResponseEntity<EntityModel<CreateProjetoResponse>> addProjeto(@RequestBody CreateProjetoRequest createProjetoRequest) {
+        LOGGER.info("Adicionando projeto {}", createProjetoRequest.toString());
 
         try {
-            var novoProjeto = projetoService.addProjeto(adicionarProjetoDto);
+            var novoProjeto = projetoService.addProjeto(createProjetoRequest);
             var projeto = projetoAdicionadoModelAssembler.toModel(novoProjeto);
 
             var createdLocation = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -88,11 +93,11 @@ public class ProjetoController_v3 {
     }
 
     @PutMapping("/{projetoId}")
-    public ResponseEntity<EntityModel<ProjetoAtualizadoResponseDto>> updateProjeto(@RequestBody AtualizarProjetoDto atualizarProjetoDto, @PathVariable("projetoId") UUID projetoId) {
+    public ResponseEntity<EntityModel<UpdateProjetoResponse>> updateProjeto(@RequestBody UpdateProjetoRequest updateProjetoRequest, @PathVariable("projetoId") UUID projetoId) {
         LOGGER.info("Atualizando dados do projeto {}", projetoId);
 
         try {
-            var projetoAtualizado = projetoService.updateProjeto(atualizarProjetoDto, projetoId);
+            var projetoAtualizado = projetoService.updateProjeto(updateProjetoRequest, projetoId);
             var projeto = projetoAtualizadoModelAssembler.toModel(projetoAtualizado);
             return ResponseEntity.ok(projeto);
         } catch (HttpClientErrorException e) {

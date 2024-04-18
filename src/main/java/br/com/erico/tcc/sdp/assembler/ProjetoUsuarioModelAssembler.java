@@ -1,7 +1,7 @@
 package br.com.erico.tcc.sdp.assembler;
 
 import br.com.erico.tcc.sdp.controller.v3.ProjetoController_v3;
-import br.com.erico.tcc.sdp.dto.ProjetoUsuarioResponseDto;
+import br.com.erico.tcc.sdp.dto.response.GetProjetoUsuarioResponse;
 import br.com.erico.tcc.sdp.enumeration.StatusEnum;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -17,10 +17,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class ProjetoUsuarioModelAssembler implements RepresentationModelAssembler<ProjetoUsuarioResponseDto, EntityModel<ProjetoUsuarioResponseDto>> {
+public class ProjetoUsuarioModelAssembler implements RepresentationModelAssembler<GetProjetoUsuarioResponse, EntityModel<GetProjetoUsuarioResponse>> {
 
     @Override
-    public EntityModel<ProjetoUsuarioResponseDto> toModel(ProjetoUsuarioResponseDto entity) {
+    public EntityModel<GetProjetoUsuarioResponse> toModel(GetProjetoUsuarioResponse entity) {
         var entityModel = EntityModel.of(entity);
 
         entityModel.add(linkTo(methodOn(ProjetoController_v3.class).getProjetoById(entity.id())).withRel(IanaLinkRelations.ITEM));
@@ -35,11 +35,11 @@ public class ProjetoUsuarioModelAssembler implements RepresentationModelAssemble
     }
 
     @Override
-    public CollectionModel<EntityModel<ProjetoUsuarioResponseDto>> toCollectionModel(Iterable<? extends ProjetoUsuarioResponseDto> entities) {
+    public CollectionModel<EntityModel<GetProjetoUsuarioResponse>> toCollectionModel(Iterable<? extends GetProjetoUsuarioResponse> entities) {
         return RepresentationModelAssembler.super.toCollectionModel(entities);
     }
 
-    public CollectionModel<EntityModel<ProjetoUsuarioResponseDto>> toCollection(List<ProjetoUsuarioResponseDto> entities, UUID usuarioId) {
+    public CollectionModel<EntityModel<GetProjetoUsuarioResponse>> toCollection(List<GetProjetoUsuarioResponse> entities, UUID usuarioId) {
         var collectionModel = toCollectionModel(entities);
 
         collectionModel.add(linkTo(methodOn(ProjetoController_v3.class).getProjetosByUsuario(usuarioId)).withSelfRel());
