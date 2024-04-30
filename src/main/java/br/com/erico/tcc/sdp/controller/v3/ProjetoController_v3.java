@@ -17,8 +17,6 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.UUID;
@@ -46,77 +44,51 @@ public class ProjetoController_v3 {
     public ResponseEntity<CollectionModel<EntityModel<GetProjetoUsuarioResponse>>> getProjetosByUsuario(@PathVariable("usuarioId") UUID usuarioId) {
         LOGGER.info("Buscando projetos do usuário {}", usuarioId);
 
-        try {
-            var projetoList = projetoService.getProjetosByUsuario(usuarioId);
-            var projetos = projetoUsuarioModelAssembler.toCollection(projetoList, usuarioId);
+        var projetoList = projetoService.getProjetosByUsuario(usuarioId);
+        var projetos = projetoUsuarioModelAssembler.toCollection(projetoList, usuarioId);
 
-            return ResponseEntity.ok(projetos);
-        } catch (HttpClientErrorException e) {
-            LOGGER.error(e.getMessage());
-            return ResponseEntity.status(e.getStatusCode()).build();
-        }
-
+        return ResponseEntity.ok(projetos);
     }
 
     @GetMapping("/{projetoId}")
     public ResponseEntity<EntityModel<GetProjetoByIdResponse>> getProjetoById(@PathVariable("projetoId") UUID projetoId) {
         LOGGER.info("Buscando projeto {}", projetoId);
 
-        try {
-            var projetoEncontrado = projetoService.getProjetoById(projetoId);
-            var projeto = projetoModelAssembler.toModel(projetoEncontrado);
-            return ResponseEntity.ok(projeto);
-        } catch (HttpClientErrorException e) {
-            LOGGER.error(e.getStatusText());
-            return ResponseEntity.status(e.getStatusCode()).build();
-        }
+        var projetoEncontrado = projetoService.getProjetoById(projetoId);
+        var projeto = projetoModelAssembler.toModel(projetoEncontrado);
+        return ResponseEntity.ok(projeto);
     }
 
     @PostMapping
     public ResponseEntity<EntityModel<CreateProjetoResponse>> addProjeto(@RequestBody CreateProjetoRequest createProjetoRequest) {
         LOGGER.info("Adicionando projeto {}", createProjetoRequest.toString());
 
-        try {
-            var novoProjeto = projetoService.addProjeto(createProjetoRequest);
-            var projeto = projetoAdicionadoModelAssembler.toModel(novoProjeto);
+        var novoProjeto = projetoService.addProjeto(createProjetoRequest);
+        var projeto = projetoAdicionadoModelAssembler.toModel(novoProjeto);
 
-            var createdLocation = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{projetoId}")
-                    .buildAndExpand(novoProjeto.id())
-                    .toUri();
+        var createdLocation = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{projetoId}")
+                .buildAndExpand(novoProjeto.id())
+                .toUri();
 
-            return ResponseEntity.created(createdLocation).body(projeto);
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
-            LOGGER.error(e.getStatusText());
-            return ResponseEntity.status(e.getStatusCode()).build();
-        }
+        return ResponseEntity.created(createdLocation).body(projeto);
     }
 
     @PutMapping("/{projetoId}")
     public ResponseEntity<EntityModel<UpdateProjetoResponse>> updateProjeto(@RequestBody UpdateProjetoRequest updateProjetoRequest, @PathVariable("projetoId") UUID projetoId) {
         LOGGER.info("Atualizando dados do projeto {}", projetoId);
 
-        try {
-            var projetoAtualizado = projetoService.updateProjeto(updateProjetoRequest, projetoId);
-            var projeto = projetoAtualizadoModelAssembler.toModel(projetoAtualizado);
-            return ResponseEntity.ok(projeto);
-        } catch (HttpClientErrorException e) {
-            LOGGER.error(e.getStatusText());
-            return ResponseEntity.status(e.getStatusCode()).build();
-        }
+        var projetoAtualizado = projetoService.updateProjeto(updateProjetoRequest, projetoId);
+        var projeto = projetoAtualizadoModelAssembler.toModel(projetoAtualizado);
+        return ResponseEntity.ok(projeto);
     }
 
     @DeleteMapping("/{projetoId}")
     public ResponseEntity<Void> deleteProjeto(@PathVariable("projetoId") UUID projetoId) {
         LOGGER.info("Deletando projeto {}", projetoId);
 
-        try {
-            projetoService.deleteProjeto(projetoId);
-            return ResponseEntity.noContent().build();
-        } catch (HttpClientErrorException e) {
-            LOGGER.error(e.getStatusText());
-            return ResponseEntity.status(e.getStatusCode()).build();
-        }
+        projetoService.deleteProjeto(projetoId);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -8,6 +8,7 @@ import br.com.erico.tcc.sdp.dto.response.GetProjetoUsuarioResponse;
 import br.com.erico.tcc.sdp.dto.response.UpdateProjetoResponse;
 import br.com.erico.tcc.sdp.enumeration.PeriodoEnum;
 import br.com.erico.tcc.sdp.enumeration.StatusEnum;
+import br.com.erico.tcc.sdp.exception.*;
 import br.com.erico.tcc.sdp.model.EixoTecnologico;
 import br.com.erico.tcc.sdp.model.Projeto;
 import br.com.erico.tcc.sdp.model.Status;
@@ -38,9 +39,9 @@ public class ProjetoService {
         this.periodoRepository = periodoRepository;
     }
 
-    public List<GetProjetoUsuarioResponse> getProjetosByUsuario(UUID usuarioId) throws HttpClientErrorException {
+    public List<GetProjetoUsuarioResponse> getProjetosByUsuario(UUID usuarioId) throws UsuarioNaoEncontradoException {
         usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado"));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado", usuarioId));
 
         var projetos = projetoRepository.findByUsuarioId(usuarioId);
 
@@ -50,29 +51,31 @@ public class ProjetoService {
                 .toList();
     }
 
-    public GetProjetoByIdResponse getProjetoById(UUID projetoId) throws HttpClientErrorException {
+    public GetProjetoByIdResponse getProjetoById(UUID projetoId) throws ProjetoNaoEncontradoException {
         var projeto = projetoRepository.findById(projetoId);
 
-        return projeto.map(p -> new GetProjetoByIdResponse(p.getId(), p.getNumero(), p.getNome(), p.getModalidade(),
+        var projetoEncontrado = projeto.map(p -> new GetProjetoByIdResponse(p.getId(), p.getNumero(), p.getNome(), p.getModalidade(),
                         p.getJustificativa(), p.getDataCriacao(), p.getAno(), p.getStatus().getId(),
-                        p.isPortalProjetos(), p.getDataFinalizacao(), p.getImpactosAmbientais()))
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados projetos com ID " + projetoId));
+                        p.isPortalProjetos(), p.getDataFinalizacao(), p.getImpactosAmbientais()));
+
+        return projetoEncontrado.orElseThrow(() -> new ProjetoNaoEncontradoException("Não foram encontrados projetos com o UUID " + projetoId, projetoId));
     }
 
-    public CreateProjetoResponse addProjeto(CreateProjetoRequest createProjetoRequest) throws HttpClientErrorException, HttpServerErrorException {
+    public CreateProjetoResponse addProjeto(CreateProjetoRequest createProjetoRequest)
+            throws ProjetoExistenteException, UsuarioNaoEncontradoException, PeriodoInvalidoException {
         usuarioRepository.findById(createProjetoRequest.usuarioId())
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado"));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado", createProjetoRequest.usuarioId()));
 
-        var periodoSubmissaoProjetos = periodoRepository.findById(PeriodoEnum.SUBMISSAO_PROJETOS.getId())
+        var periodo = periodoRepository.findById(PeriodoEnum.SUBMISSAO_PROJETOS.getId())
                 .orElseThrow(() -> new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Falha ao consultar período de submissão de projetos"));
 
-        if (periodoSubmissaoProjetos.getDataInicio().isAfter(LocalDate.now()) ||
-                periodoSubmissaoProjetos.getDataFim().isBefore(LocalDate.now())) {
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Fora do prazo de submissão de projetos");
+        if (periodo.getDataInicio().isAfter(LocalDate.now()) || periodo.getDataFim().isBefore(LocalDate.now())) {
+            throw new PeriodoInvalidoException("Fora do prazo de submissão de projetos", PeriodoEnum.SUBMISSAO_PROJETOS,
+                    periodo.getDataInicio(), periodo.getDataFim());
         }
 
         if (projetoRepository.existsByNumero(createProjetoRequest.numero())) {
-            throw new HttpClientErrorException(HttpStatus.CONFLICT, "Número de projeto já existente");
+            throw new ProjetoExistenteException("Número de projeto já existente", createProjetoRequest.numero());
         }
 
         var usuario = new Usuario();
@@ -100,9 +103,10 @@ public class ProjetoService {
         return new CreateProjetoResponse(savedProjeto);
     }
 
-    public UpdateProjetoResponse updateProjeto(UpdateProjetoRequest updateProjetoRequest, UUID projetoId) throws HttpClientErrorException {
+    public UpdateProjetoResponse updateProjeto(UpdateProjetoRequest updateProjetoRequest, UUID projetoId)
+            throws ProjetoNaoEncontradoException {
         var projeto = projetoRepository.findById(projetoId)
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados projetos com ID " + projetoId));
+                .orElseThrow(() -> new ProjetoNaoEncontradoException("Não foram encontrados projetos com ID " + projetoId, projetoId));
 
         projeto.setNumero(updateProjetoRequest.numero() != null ? updateProjetoRequest.numero() : projeto.getNumero());
         projeto.setNome(updateProjetoRequest.nome() != null ? updateProjetoRequest.nome().toUpperCase() : projeto.getNome());
@@ -115,14 +119,16 @@ public class ProjetoService {
         return new UpdateProjetoResponse(projeto);
     }
 
-    public void deleteProjeto(UUID projetoId) throws HttpClientErrorException {
+    public void deleteProjeto(UUID projetoId)
+            throws ProjetoNaoEncontradoException, StatusRemocaoProjetoInvalidoException {
         var projeto = projetoRepository.findById(projetoId)
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Não foram encontrados projetos com ID " + projetoId));
+                .orElseThrow(() -> new ProjetoNaoEncontradoException("Não foram encontrados projetos com ID " + projetoId, projetoId));
 
         if (!Objects.equals(projeto.getStatus().getId(), StatusEnum.NAO_FINALIZADO.getId()) &&
                 !Objects.equals(projeto.getStatus().getId(), StatusEnum.NAO_APROVADO.getId())) {
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN,
-                    "Projetos com status de valor " + projeto.getStatus().getId() + " (" + projeto.getStatus().getNome() + ") não podem ser deletados");
+            throw new StatusRemocaoProjetoInvalidoException(
+                    "Projetos com status de valor " + projeto.getStatus().getId() + " (" + projeto.getStatus().getNome() + ") não podem ser deletados",
+                    StatusEnum.NAO_FINALIZADO);
         }
 
         projetoRepository.delete(projeto);
