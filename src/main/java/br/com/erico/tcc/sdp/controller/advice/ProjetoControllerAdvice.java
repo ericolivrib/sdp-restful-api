@@ -32,7 +32,7 @@ public class ProjetoControllerAdvice {
     public final ResponseEntity<ProjetoExistenteExceptionResponse> handleProjetoExistenteException(ProjetoExistenteException e) {
         LOGGER.error(e.getMessage());
         var errorResponse = new ProjetoExistenteExceptionResponse(e.getMessage(), e.getNumeroProjeto());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(StatusRemocaoProjetoInvalidoException.class)
