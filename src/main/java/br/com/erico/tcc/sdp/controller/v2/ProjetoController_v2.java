@@ -10,8 +10,6 @@ import br.com.erico.tcc.sdp.dto.response.UpdateProjetoResponse;
 import br.com.erico.tcc.sdp.dto.response.exception.*;
 import br.com.erico.tcc.sdp.service.ProjetoService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,7 +1,6 @@
 package br.com.erico.tcc.sdp.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.SchemaProperty;
 
 import java.time.LocalDate;
 import java.util.UUID;
