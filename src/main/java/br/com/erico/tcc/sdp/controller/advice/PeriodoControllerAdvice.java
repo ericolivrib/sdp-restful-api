@@ -2,6 +2,7 @@ package br.com.erico.tcc.sdp.controller.advice;
 
 import br.com.erico.tcc.sdp.dto.response.exception.PeriodoInvalidoExceptionResponse;
 import br.com.erico.tcc.sdp.exception.PeriodoInvalidoException;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ public class PeriodoControllerAdvice {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PeriodoControllerAdvice.class);
 
+    @Hidden
     @ExceptionHandler(PeriodoInvalidoException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ResponseEntity<PeriodoInvalidoExceptionResponse> handlePeriodoInvalidoException(PeriodoInvalidoException e) {
