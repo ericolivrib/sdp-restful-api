@@ -2,6 +2,7 @@ package br.com.erico.tcc.sdp.controller.advice;
 
 import br.com.erico.tcc.sdp.dto.response.exception.UsuarioNaoEncontradoExceptionResponse;
 import br.com.erico.tcc.sdp.exception.UsuarioNaoEncontradoException;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,9 +16,10 @@ public class UsuarioControllerAdvice {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UsuarioControllerAdvice.class);
 
+    @Hidden
     @ExceptionHandler(UsuarioNaoEncontradoException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<UsuarioNaoEncontradoExceptionResponse> handleProjetoNaoEncontradoException(final UsuarioNaoEncontradoException e) {
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<UsuarioNaoEncontradoExceptionResponse> handleUsuarioNaoEncontradoException(final UsuarioNaoEncontradoException e) {
         LOGGER.error(e.getMessage());
         var errorResponse = new UsuarioNaoEncontradoExceptionResponse(e.getMessage(), e.getUsuarioId());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
